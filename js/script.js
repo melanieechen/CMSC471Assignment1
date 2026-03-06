@@ -23,6 +23,44 @@ const mapG = svg.append('g').attr('class', 'map-layer');
 
 const outerSvg = d3.select('#vis svg');
 
+// ----- Detail (line chart) setup -----
+const detailMargin = { top: 40, right: 30, bottom: 50, left: 60 };
+const detailWidth = 800 - detailMargin.left - detailMargin.right;
+const detailHeight = 300 - detailMargin.top - detailMargin.bottom;
+
+const detailSvg = d3.select("#detailVis")
+  .append("svg")
+  .attr("width", detailWidth + detailMargin.left + detailMargin.right)
+  .attr("height", detailHeight + detailMargin.top + detailMargin.bottom);
+
+const detailG = detailSvg.append("g")
+  .attr("transform", `translate(${detailMargin.left},${detailMargin.top})`);
+
+const xAxisG = detailG.append("g")
+  .attr("transform", `translate(0,${detailHeight})`);
+
+const yAxisG = detailG.append("g");
+
+detailG.append("text")
+  .attr("class", "x-label")
+  .attr("x", detailWidth / 2)
+  .attr("y", detailHeight + 40)
+  .attr("text-anchor", "middle")
+  .text("Date");
+
+const yLabel = detailG.append("text")
+  .attr("class", "y-label")
+  .attr("transform", "rotate(-90)")
+  .attr("x", -detailHeight / 2)
+  .attr("y", -45)
+  .attr("text-anchor", "middle")
+  .text("TAVG");
+
+const linePath = detailG.append("path")
+  .attr("fill", "none")
+  .attr("stroke", "steelblue")
+  .attr("stroke-width", 2);
+
 const zoom = d3.zoom()
   .scaleExtent([1, 8]) // min/max zoom
   .on('zoom', (event) => {
@@ -58,6 +96,22 @@ function init(){
 
       usData = us;
       weatherData = weather;
+
+      weatherData.forEach(d => {
+  // date is like "20170312"
+  d.dateObj = d3.timeParse("%Y%m%d")(d.date);
+
+  // numeric fields (empty string => NaN)
+  d.TAVG = d.TAVG === "" ? NaN : +d.TAVG;
+  d.TMIN = d.TMIN === "" ? NaN : +d.TMIN;
+  d.TMAX = d.TMAX === "" ? NaN : +d.TMAX;
+  d.PRCP = d.PRCP === "" ? NaN : +d.PRCP;
+  d.SNOW = d.SNOW === "" ? NaN : +d.SNOW;
+  d.SNWD = d.SNWD === "" ? NaN : +d.SNWD;
+  d.AWND = d.AWND === "" ? NaN : +d.AWND;
+  d.WSF5 = d.WSF5 === "" ? NaN : +d.WSF5;
+  d.WDF5 = d.WDF5 === "" ? NaN : +d.WDF5;
+});
 
       processStations();
       updateMap();
@@ -148,6 +202,9 @@ function updateVis(){
 
                   tooltip.style('opacity', 0);
               })
+              .on('click', (event, d) => {
+                renderDetailChart(d.station, "TAVG"); // default metric
+                })
               .transition()
               .attr('r', 3),
 
@@ -169,4 +226,57 @@ function updateVis(){
               .attr('r', 0)
               .remove()
       );
+}
+
+
+function renderDetailChart(stationName, metric = "TAVG") {
+  // Filter rows for this station
+  let series = weatherData
+    .filter(d => d.station === stationName && d.dateObj)
+    .map(d => ({ date: d.dateObj, value: d[metric] }))
+    .filter(d => Number.isFinite(d.value))
+    .sort((a, b) => a.date - b.date);
+
+  d3.select("#detailTitle")
+    .html(`<h4>${stationName} — ${metric} over time</h4>`);
+
+  // If no usable data, clear and show message
+  if (series.length === 0) {
+    linePath.attr("d", null);
+    xAxisG.call(d3.axisBottom(d3.scaleTime().range([0, detailWidth])));
+    yAxisG.call(d3.axisLeft(d3.scaleLinear().range([detailHeight, 0])));
+    yLabel.text(metric);
+    detailG.selectAll(".no-data").data([null]).join("text")
+      .attr("class", "no-data")
+      .attr("x", detailWidth / 2)
+      .attr("y", detailHeight / 2)
+      .attr("text-anchor", "middle")
+      .text("No data available for this station/metric.");
+    return;
+  } else {
+    detailG.selectAll(".no-data").remove();
+  }
+
+  const x = d3.scaleTime()
+    .domain(d3.extent(series, d => d.date))
+    .range([0, detailWidth]);
+
+  const y = d3.scaleLinear()
+    .domain(d3.extent(series, d => d.value))
+    .nice()
+    .range([detailHeight, 0]);
+
+  const line = d3.line()
+    .x(d => x(d.date))
+    .y(d => y(d.value));
+
+  xAxisG.transition().duration(600).call(d3.axisBottom(x));
+  yAxisG.transition().duration(600).call(d3.axisLeft(y));
+  yLabel.text(metric);
+
+  linePath
+    .datum(series)
+    .transition()
+    .duration(600)
+    .attr("d", line);
 }
