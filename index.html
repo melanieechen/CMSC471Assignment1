@@ -12,10 +12,30 @@
         
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
+        <p><br>Welcome to our website! This visualization allows you to explore US weather measurements from 2017, including average temperatures, precipitation, and snowfall. 
+            
+        <br><br><u>Directions:</u><br>
+        <br>Click and drag inside the map box to pan to different parts of the country. Use two fingers and drag to zoom in and out on the map. To restore the default view, click the "Reset Zoom" button above the map.
+
+        <br><br>
+        Hovering on a weather station dot will allow you to see the name of the weather station, the state its located in, and the average values for temperature, precipitation, and snowfall recorded at that location. 
+
+        <br><br>
+        Clicking on a weather station will cause a second graph to appear, displaying a line graph of weather measurements over time. Use the dropdown menus to select which weather information you'd like to visualize.
+
+        <br><br> Note that for some weather stations, some types of data may not be available.
+
+        <br><br>Happy exploring!!
+
+        <br><br>- Melanie, Anushka, and Aditri
+    
+        </p>
+
         <div id="controls">
 
             <!-- drop downs -->
 
+            <br></br>
             <div class="mb-3">
                 <button id="resetZoom" class="btn btn-secondary btn-sm">
                     Reset Zoom
@@ -27,12 +47,59 @@
         
         <div id="vis"></div> <!--  Will hold our visualization (SVG) -->
 
+        <!-- for the line graphs -->
+        <div id="detailTitle" class="mt-4"></div>
+        <div id="detailVis"></div>
+
+        <p>NEED TO ADD LABELS AND CAPTIONS FOR THE VISUALIZATIONS</p>
+
         <div id="tooltip" class="tooltip" style="opacity:0;"></div> <!-- for adding tooltips -->
-
-
 
     </div>
     
+    <br><br><br>
+    <p><u>Assignment Write-Up</u>
+    
+        <br><br>Introduction:<br>
+        This project visualizes daily weather observations from the NOAA Global Historical Climatology Network (GHCN) dataset. The data was collected a various stations across the United States in 2017. The dataset provides geographic information (station name, state, latitude, longitude, elevation) and daily weather information such as:
+        <ul>
+        <li>TMIN – Minimum temperature (°F)</li>
+        <li>TMAX – Maximum temperature (°F)</li>
+        <li>TAVG – Average temperature (°F)</li>
+        <li>PRCP – Precipitation (inches)</li>
+        <li>SNOW – Snowfall (inches)</li>
+        <li>SNWD – Snow depth (inches)</li>
+        <li>AWND – Average wind speed (mph)</li>
+        <li>WSF5 – Fastest 5-second wind speed (mph)</li>
+        <li>WDF5 – Direction of fastest 5-second wind (degrees)</li>
+        </ul>
+        In our visualization, we focus on showing the distribution of stations across the US and their average recorded values for TAVG (average temperature), PRCP (precipitation), and SNOW (snowfall). We also allow users to explore trends for these values over time.
+
+        <br><br>Rationale:<br>
+        Since this data was already spatially distributed across the country, it felt natural to display it overlaid on a map of the United States. We also thought that mapping all the weather stations would help users find greater insights into how average temperature, precipitation, and snowfall are similar and different from region-to-region.<br><br>
+        After plotting all the weather stations on the map, we noticed that many regions were densely populated so the dots for different stations overlapped. We decided to address this issue by adding a pan/zoom option so that users could take a closer look at those densely populated regions and explore individual stations they were interested in with more control. Because of the ability to infinitely pan, one of our developers (Anushka) got lost on the page and couldn't find her way back home to the map! Then she added a reset zoom button to help out any future users who might find themselves in a similarly sticky situation.<br><br>
+        Next, we added a tooltips feature so that users could know which station was which. Along with the name of the station, we also decided to display the location's average recorded weather values when someone hovered on the point. This way, if someone wanted to get quick readings from a particular location, they could just hover and get that information.<br><br>
+        We also noted that for many stations, there was data available from different timepoints. Just displaying the average value didn't seem like it did justice to this data available. Thus, we implemented the second graph to display the time-series data. We think it is interesting to be able to see how much a location's weather patterns vary (or don't vary) as the seasons change.<br><br>
+        ADD SOMETHING ABOUT ALTERNATIVES WE CONSIDERED AND SOMETHING ABOUT DROP DOWNS
+
+        <br><br>References:<br>
+        SOMEONE FILL THIS IN
+
+        <br><br>Development Process:<br>
+        Melanie created the framework for this website and set up the foundation for all the visualizations, including importing the data, outlining the HTML file, and deciding basic formatting. She also implemented the map display and made all the weather stations show up as points on the map.<br><br>
+        Anushka added features in Category II: Exploration. She implemented the pan/zoom option, made the tooltips work properly, and added the second line graph visualization below the map. Anushka also wrote up the directions/introduction to the website, and completed the bulk of the assignment write-up below the visualizations (introduction, rationale, and development process).<br><br>
+        FILL IN ADITRI WORK<br><br>
+        FILL THIS IN: Roughly how much time did you spend developing your application (in people-hours)? What aspects took the most time?
+
+        <br><br>AI Usage:<br>
+        FINISH THIS
+        anushka's use: I used ChatGPT to generate code for the tooltips and pan/zoom features.
+
+
+
+    
+    </p>
+
     <!-- Load D3.js -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="js/script.js"></script>
