@@ -15,7 +15,8 @@
         <p><br>Welcome to our website! This visualization allows you to explore US weather measurements from 2017, including average temperatures, precipitation, and snowfall. 
             
         <br><br><u>Directions:</u><br>
-        <br>Click and drag inside the map box to pan to different parts of the country. Use two fingers and drag to zoom in and out on the map. To restore the default view, click the "Reset Zoom" button above the map.
+        <br>Click and drag inside the map box to pan to different parts of the country. Use two fingers and drag to zoom in and out on the map. To restore the default view, click the "Reset Zoom" button above the map. 
+        The color grading allows you to visualize weather trends across the country. Use the dropdown menu to select which weather information you would like to visualize on the map. 
 
         <br><br>
         Hovering on a weather station dot will allow you to see the name of the weather station, the state its located in, and the average values for temperature, precipitation, and snowfall recorded at that location. 
@@ -37,6 +38,13 @@
 
             <br></br>
             <div class="mb-3">
+                <label for="metricSelect"><strong>Select Weather Variable:</strong></label>
+                    <select id="metricSelect" class="form-select weather-metric" style="width: auto; display: inline-block;">
+                        <option value="TAVG" selected>Average Temperature</option>
+                        <option value="PRCP">Precipitation</option>
+                        <option value="SNOW">Snowfall</option>
+                    </select>
+                
                 <button id="resetZoom" class="btn btn-secondary btn-sm">
                     Reset Zoom
                 </button>
@@ -44,14 +52,18 @@
 
         </div>
 
-        
+        <div id="legend-container" class="mt-3 mb-2" style="max-width: 400px;">
+            <div id="legend-svg"></div>
+        </div>
+
+        <h3 class="mt-4">Figure 1: Weather Stations Across the US</h3>
         <div id="vis"></div> <!--  Will hold our visualization (SVG) -->
 
+
         <!-- for the line graphs -->
+        <h3 class="mt-4">Figure 2: Weather Trends Over Time</h3>
         <div id="detailTitle" class="mt-4"></div>
         <div id="detailVis"></div>
-
-        <p>NEED TO ADD LABELS AND CAPTIONS FOR THE VISUALIZATIONS</p>
 
         <div id="tooltip" class="tooltip" style="opacity:0;"></div> <!-- for adding tooltips -->
 
@@ -79,24 +91,20 @@
         Since this data was already spatially distributed across the country, it felt natural to display it overlaid on a map of the United States. We also thought that mapping all the weather stations would help users find greater insights into how average temperature, precipitation, and snowfall are similar and different from region-to-region.<br><br>
         After plotting all the weather stations on the map, we noticed that many regions were densely populated so the dots for different stations overlapped. We decided to address this issue by adding a pan/zoom option so that users could take a closer look at those densely populated regions and explore individual stations they were interested in with more control. Because of the ability to infinitely pan, one of our developers (Anushka) got lost on the page and couldn't find her way back home to the map! Then she added a reset zoom button to help out any future users who might find themselves in a similarly sticky situation.<br><br>
         Next, we added a tooltips feature so that users could know which station was which. Along with the name of the station, we also decided to display the location's average recorded weather values when someone hovered on the point. This way, if someone wanted to get quick readings from a particular location, they could just hover and get that information.<br><br>
-        We also noted that for many stations, there was data available from different timepoints. Just displaying the average value didn't seem like it did justice to this data available. Thus, we implemented the second graph to display the time-series data. We think it is interesting to be able to see how much a location's weather patterns vary (or don't vary) as the seasons change.<br><br>
-        ADD SOMETHING ABOUT ALTERNATIVES WE CONSIDERED AND SOMETHING ABOUT DROP DOWNS
+        We also noted that for many stations, there was data available from different timepoints. Just displaying the average value didn't seem like it did justice to this data available. Thus, we implemented the second graph to display the time-series data. We added a drop-down so that users can easily select the weather information they would like to investigate. We think it is interesting to be able to see how much a location's weather patterns vary (or don't vary) as the seasons change.<br><br>
+        Following this, though we fulfilled all of our requirements, we realized that we weren't using the map visualization to its fullest potential. We decided to add color grading so that users could pan around the map and quickly see patterns without having to hover over every point. We tied this feature in with our dropdown menu, allowing users to select the weather information they would like to visualize via color grading. We considered using size as an indicator instead of color, but realized that the overlapping nature of the data points would make it difficult to rely on size. We decided color would be more efficient and visually appealing. We also added a legend to explain the color grading scale. <br><br>
 
         <br><br>References:<br>
-        SOMEONE FILL THIS IN
+        We used "Daily Weather in the U.S., 2017" from the NOAA Daily Global Historical Climatology Network. This data contains daily U.S. weather measurements in 2017.
 
         <br><br>Development Process:<br>
         Melanie created the framework for this website and set up the foundation for all the visualizations, including importing the data, outlining the HTML file, and deciding basic formatting. She also implemented the map display and made all the weather stations show up as points on the map.<br><br>
         Anushka added features in Category II: Exploration. She implemented the pan/zoom option, made the tooltips work properly, and added the second line graph visualization below the map. Anushka also wrote up the directions/introduction to the website, and completed the bulk of the assignment write-up below the visualizations (introduction, rationale, and development process).<br><br>
-        FILL IN ADITRI WORK<br><br>
-        FILL THIS IN: Roughly how much time did you spend developing your application (in people-hours)? What aspects took the most time?
+        Aditri added the dropdown menu and added color grading to the map based on the selected value in the dropdown menu. She also recorded the demo video and finished up the write-up. <br><br>
+        We each took 2-3 hours to develop the application. The most time consuming part was the initial code setup. 
 
         <br><br>AI Usage:<br>
-        FINISH THIS
-        anushka's use: I used ChatGPT to generate code for the tooltips and pan/zoom features.
-
-
-
+        We used ChatGPT to help generate code for the tooltips, pan/zoom features, and color grading features.
     
     </p>
 

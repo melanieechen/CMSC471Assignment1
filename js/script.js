@@ -10,6 +10,8 @@ const tooltip = d3.select('#tooltip');
 let usData = [];
 let weatherData = [];
 let stations = [];
+let currentMetric = "TAVG"; 
+let activeStation = null;  
 
 // creating the actual SVG 
 const svg = d3.select('#vis')
@@ -118,6 +120,27 @@ function init(){
       updateVis();
 
   })
+
+// dropdown 
+d3.selectAll('.weather-metric')
+    .on("change", function (event) {
+        const selectedValue = d3.select(this).property("value");
+        const dropdownId = d3.select(this).property("id");
+
+        console.log("Changed:", dropdownId, "to", selectedValue);
+
+        if (dropdownId === "metricSelect") {
+            currentMetric = selectedValue;
+        }
+
+        updateVis();
+
+        if (activeStation) {
+            renderDetailChart(activeStation, currentMetric);
+        }
+    });
+
+
 }
 
 window.addEventListener('load', init);
@@ -153,8 +176,66 @@ function updateMap(){
       .attr('stroke', '#999');
 }
 
+
+function updateLegend(colorScale) {
+    const legendWidth = 300;
+    const legendHeight = 15;
+    
+    d3.select("#legend-svg").selectAll("*").remove();
+    
+    // draw legend
+    const svg = d3.select("#legend-svg")
+        .append("svg")
+        .attr("width", legendWidth + 40)
+        .attr("height", legendHeight + 30)
+        .append("g")
+        .attr("transform", "translate(20,10)");
+
+    // create gradient
+    const defs = svg.append("defs");
+    const linearGradient = defs.append("linearGradient")
+        .attr("id", "linear-gradient");
+
+    linearGradient.selectAll("stop")
+        .data(d3.range(0, 1.1, 0.1))
+        .enter().append("stop")
+        .attr("offset", d => `${d * 100}%`)
+        .attr("stop-color", d => colorScale(colorScale.domain()[1] + d * (colorScale.domain()[0] - colorScale.domain()[1])));
+
+    svg.append("rect")
+        .attr("width", legendWidth)
+        .attr("height", legendHeight)
+        .style("fill", "url(#linear-gradient)");
+
+    // add min and max labels
+    const extent = d3.extent(stations, d => d[currentMetric]);
+    const unit = currentMetric.includes("T") ? "°F" : "in";
+    
+    svg.append("text")
+        .attr("x", 0)
+        .attr("y", legendHeight + 15)
+        .style("font-size", "12px")
+        .text(`${extent[0].toFixed(1)} ${unit}`);
+
+    svg.append("text")
+        .attr("x", legendWidth)
+        .attr("y", legendHeight + 15)
+        .attr("text-anchor", "end")
+        .style("font-size", "12px")
+        .text(`${extent[1].toFixed(1)} ${unit}`);
+
+}
+
+
 // drawing the stations as circles onto the map 
 function updateVis(){
+  const colorScale = d3.scaleSequential()
+    .domain(d3.extent(stations, d => d[currentMetric]))
+    .interpolator(currentMetric.includes("T") ? d3.interpolateRdYlBu : d3.interpolateBlues);
+  
+  if (currentMetric.includes("T")) {
+    colorScale.domain([d3.max(stations, d => d[currentMetric]), d3.min(stations, d => d[currentMetric])]);
+  }
 
   mapG.selectAll('.stations')
       .data(stations, d => d.station)
@@ -203,14 +284,17 @@ function updateVis(){
                   tooltip.style('opacity', 0);
               })
               .on('click', (event, d) => {
+                activeStation = d.station; 
                 renderDetailChart(d.station, "TAVG"); // default metric
                 })
               .transition()
-              .attr('r', 3),
+              .attr('r', 3)
+              .attr('fill', d => colorScale(d[currentMetric])),
 
           // update
           update => update
               .transition()
+              .attr('fill', d => colorScale(d[currentMetric]))
               .attr('cx', d => {
                   const coords = projection([d.longitude, d.latitude]);
                   return coords ? coords[0] : null;
@@ -226,6 +310,7 @@ function updateVis(){
               .attr('r', 0)
               .remove()
       );
+      updateLegend(colorScale);
 }
 
 
